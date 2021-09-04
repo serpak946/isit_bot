@@ -22,7 +22,7 @@ def clean(text):
     # чистый текст для создания папки
     return "".join(c if c.isalnum() else "_" for c in text)
 # create an IMAP4 class with SSL
-imap = imaplib.IMAP4_SSL("imap.yandex.com")
+imap = imaplib.IMAP4_SSL("imap.mail.com")
 # authenticate
 imap.login(username, password)
 # количество популярных писем для получения
