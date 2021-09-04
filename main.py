@@ -108,7 +108,7 @@ def work2():
                     
 try:
     task1 = threading.Thread(target=work, args=())
-    task2 = threading.Thread(target=work1, args=())
+    task2 = threading.Thread(target=work2, args=())
 
     task1.start()
     task2.start()
