@@ -70,6 +70,7 @@ def vk(s,f,msg,subject):
     print('='*100)
 
 def work():
+    z = 0
     while True:
         status, messages = imap.select("INBOX")
         i=int(messages[0])
