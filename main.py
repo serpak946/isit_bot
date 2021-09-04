@@ -6,6 +6,7 @@ import os
 import vk_api
 from vk_api.bot_longpoll import VkBotLongPoll, VkBotEventType
 import threading
+import time
 
 print('start')
 token = os.environ.get('Token')
@@ -44,7 +45,6 @@ def vk(s,f,msg,subject):
             except:
                 pass
             if content_type == "text/plain" and "attachment" not in content_disposition:
-                pass
                 # print text/plain emails and skip attachments
                 sender(1,body)
             elif "attachment" in content_disposition:
@@ -64,7 +64,6 @@ def vk(s,f,msg,subject):
         # get the email body
         body = msg.get_payload(decode=True).decode()
         if content_type == "text/plain":
-            pass
             # print only text email parts
             sender(1,body)
     print('='*100)
