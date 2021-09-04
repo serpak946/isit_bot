@@ -32,7 +32,6 @@ z=0
 def vk(s,f,msg,subject):
     sender(1,s)
     sender(1,f)
-    sender(1,msg)
     # if the email message is multipart
     if msg.is_multipart():
         # iterate over email parts
@@ -47,6 +46,7 @@ def vk(s,f,msg,subject):
                 pass
             if content_type == "text/plain" and "attachment" not in content_disposition:
                 # print text/plain emails and skip attachments
+                print(2)
                 sender(1,body)
             elif "attachment" in content_disposition:
                 # download attachment
@@ -66,6 +66,7 @@ def vk(s,f,msg,subject):
         body = msg.get_payload(decode=True).decode()
         if content_type == "text/plain":
             # print only text email parts
+            print(2)
             sender(1,body)
     print('='*100)
 
