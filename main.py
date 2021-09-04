@@ -7,6 +7,7 @@ import vk_api
 from vk_api.bot_longpoll import VkBotLongPoll, VkBotEventType
 import threading
 
+print('start')
 token = os.environ.get('Token')
 username = os.environ.get('mail')
 password = os.environ.get('password')
