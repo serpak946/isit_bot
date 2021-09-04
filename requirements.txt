@@ -1,5 +1,2 @@
-imaplib
-email
 vk_api
-threading
 vk
