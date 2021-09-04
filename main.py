@@ -32,7 +32,7 @@ z=0
 def vk(s,f,msg,subject):
     sender(1,s)
     sender(1,f)
-    sender(1,body)
+    sender(1,msg)
     # if the email message is multipart
     if msg.is_multipart():
         # iterate over email parts
