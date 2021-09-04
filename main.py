@@ -40,11 +40,11 @@ def vk(s,f,msg,subject):
     sender(1,f)
     # if the email message is multipart
     if msg.is_multipart():
-        for payload in email_message.get_payload():
+        for payload in msg.get_payload():
             body = payload.get_payload(decode=True).decode('utf-8')
             sender(1,cleanhtml(body))
     else:
-        body = email_message.get_payload(decode=True).decode('utf-8')
+        body = msg.get_payload(decode=True).decode('utf-8')
         sender(1,cleanhtml(body))
     print('='*100)
 
