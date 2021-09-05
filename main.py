@@ -36,21 +36,22 @@ imap.login(username, password)
 z=0
 
 def vk(s,f,msg,subject):
-    sender(1,s)
-    sender(1,f)
+    sender(2,s)
+    sender(2,f)
     # if the email message is multipart
     if msg.is_multipart():
         for payload in msg.get_payload():
             body = payload.get_payload(decode=True).decode('utf-8')
-            sender(1,cleanhtml(body))
+            sender(2,cleanhtml(body))
     else:
         body = msg.get_payload(decode=True).decode('utf-8')
-        sender(1,cleanhtml(body))
+        sender(2,cleanhtml(body))
     print('='*100)
 
 def work():
     z = 0
     while True:
+        time.sleep(5)
         status, messages = imap.select("INBOX")
         i=int(messages[0])
         res, msg = imap.fetch(str(i), "(RFC822)")
