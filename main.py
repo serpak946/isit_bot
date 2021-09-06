@@ -35,46 +35,41 @@ imap.login(username, password)
 # количество популярных писем для получения
 z=0
 
-def vk(s,f,msg,subject):
-    sender(2,s)
-    sender(2,f)
+def vk(f, msg):
+    sender(1, f)
     # if the email message is multipart
     if msg.is_multipart():
         for payload in msg.get_payload():
             body = payload.get_payload(decode=True).decode('utf-8')
-            sender(2,cleanhtml(body))
+            sender(1, cleanhtml(body))
     else:
         body = msg.get_payload(decode=True).decode('utf-8')
-        sender(2,cleanhtml(body))
-    print('='*100)
+        sender(1, cleanhtml(body))
+    print('=' * 100)
+
 
 def work():
     z = 0
     while True:
         time.sleep(5)
         status, messages = imap.select("INBOX")
-        i=int(messages[0])
+        i = int(messages[0])
         res, msg = imap.fetch(str(i), "(RFC822)")
         for response in msg:
             if isinstance(response, tuple):
                 # parse a bytes email into a message object
                 msg = email.message_from_bytes(response[1])
-                # decode the email subject
-                subject, encoding = decode_header(msg["Subject"])[0]
-                if isinstance(subject, bytes):
-                    # if it's a bytes, decode to str
-                    subject = subject.decode(encoding)
                 # decode email sender
                 From, encoding = decode_header(msg.get("From"))[0]
                 if isinstance(From, bytes):
                     From = From.decode(encoding)
-        if z==0:
-            z=1
-            id=msg['Message-Id']
-            #print(1)
-        if (msg['Message-Id']!=id):
-            vk(subject,From,msg,subject)
-            id=msg['Message-Id']
+        if z == 0:
+            z = 1
+            id = msg['Message-Id']
+            # print(1)
+        if (msg['Message-Id'] != id):
+            vk(From, msg)
+            id = msg['Message-Id']
         imap.close()
         
 def work2():
