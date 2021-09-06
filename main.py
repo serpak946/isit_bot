@@ -88,14 +88,7 @@ def work2():
                     sender(id, 'pong')
                     
 try:
-    task1 = threading.Thread(target=work, args=())
-    task2 = threading.Thread(target=work2, args=())
-
-    task1.start()
-    task2.start()
-
-    task1.join()
-    task2.join()
+    work()
 except Exception or ConnectionError or ConnectionResetError or ConnectionAbortedError or RuntimeError or TimeoutError or BaseException as e:
     print(e)
     sender(1,e)
