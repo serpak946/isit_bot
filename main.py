@@ -36,15 +36,15 @@ imap.login(username, password)
 z=0
 
 def vk(f, msg):
-    sender(1, f)
+    sender(2, f)
     # if the email message is multipart
     if msg.is_multipart():
         for payload in msg.get_payload():
             body = payload.get_payload(decode=True).decode('utf-8')
-            sender(1, cleanhtml(body))
+            sender(2, cleanhtml(body))
     else:
         body = msg.get_payload(decode=True).decode('utf-8')
-        sender(1, cleanhtml(body))
+        sender(2, cleanhtml(body))
     print('=' * 100)
 
 
