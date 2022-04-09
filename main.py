@@ -102,6 +102,7 @@ def first_enter():
 def work():
     id_mes = first_enter()
     print("start")
+    sender(1, "start")
     while True:
         imap.select("INBOX")
         result, data = imap.search(None, "ALL")
