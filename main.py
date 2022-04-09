@@ -1,91 +1,130 @@
 import imaplib
 import email
-from email.header import decode_header
-import webbrowser
-import os
-import vk_api
-from vk_api.bot_longpoll import VkBotLongPoll, VkBotEventType
-import threading
+import io
 import time
-import re
+import typing
+from email.header import decode_header
+from imap_tools import MailBox
+import vk_api
+import requests
+from vk_api.bot_longpoll import VkBotLongPoll, VkBotEventType
+import os
 
-print('start')
-token = os.environ.get('Token')
-username = os.environ.get('mail')
-password = os.environ.get('password')
+mail_name = os.environ.get("mail")
+password = os.environ.get("password")
+token = os.environ.get("Token")
 
 vk_session = vk_api.VkApi(token=token)
-longpoll = VkBotLongPoll(vk_session, 206937500) #id группы
+longpoll = VkBotLongPoll(vk_session, 206937500)  # id группы
+
+imap = imaplib.IMAP4_SSL("imap.mail.ru")
+imap.login(mail_name, password)
+
 
 def sender(id, text):
-    vk_session.method('messages.send', {'chat_id' : id, 'message' : text, 'random_id' : 0})
-    
-def cleanhtml(raw_html):
-  cleanr = re.compile('<.*?>')
-  cleantext = re.sub(cleanr, '', raw_html)
-  return cleantext
-    
-def clean(text):
-    # чистый текст для создания папки
-    return "".join(c if c.isalnum() else "_" for c in text)
-# create an IMAP4 class with SSL
-imap = imaplib.IMAP4_SSL("imap.mail.ru")
-# authenticate
-imap.login(username, password)
-# количество популярных писем для получения
-z=0
-
-def vk(f, msg):
-    sender(2, f)
-    # if the email message is multipart
-    if msg.is_multipart():
-        for payload in msg.get_payload():
-            body = payload.get_payload(decode=True).decode('utf-8')
-            sender(2, cleanhtml(body))
+    if text == "" or text is None:
+        pass
     else:
-        body = msg.get_payload(decode=True).decode('utf-8')
-        sender(2, cleanhtml(body))
-    print('=' * 100)
+        vk_session.method('messages.send', {'chat_id': id, 'message': text, 'random_id': 0})
+
+
+def attach(id):
+    with MailBox('imap.mail.ru').login(mail_name, password) as mailbox:
+        for msg in mailbox.fetch(id):
+            for att in msg.attachments:
+                with open(format(att.filename), 'wb') as f:
+                    f.write(att.payload)
+
+
+def send_docs(doc):
+    a = vk_session.method("docs.getMessagesUploadServer", {"type": "doc", "peer_id": 2000000001})
+    print(a)
+    b = requests.post(a["upload_url"], files={"file": doc}).json()
+    print(b)
+    c = vk_session.method("docs.save", {"file": b["file"], "title": "Document"})
+    print(c)
+
+    for q1 in c:
+        print(q1)
+    print()
+    print(c['doc']['owner_id'])
+    print(c['doc']['id'])
+    d = 'doc{}_{}'.format(c['doc']['owner_id'], c['doc']['id'])
+    vk_session.method('messages.send', {'chat_id': 1, 'attachment': d, 'random_id': 0})
+
+
+def body_1(email_mes):
+    body = None
+    bol = True
+    for part in email_mes.walk():
+        print(part.get_payload)
+        if part.get_content_type() == "text/plain":
+            body = part.get_payload(decode=True)
+            body = body.decode('UTF-8')
+            bol = False
+        elif bol and part.get_content_type() == "text/html":
+            body = part.get_payload(decode=True)
+            body = body.decode('UTF-8').replace("<div>", '').replace("</div>", '')
+    if body is not None:
+        return body
+    else:
+        return None
+
+
+def vk(s, msg):
+    for response in msg:
+        if isinstance(response, tuple):
+            # parse a bytes email into a message object
+            msg = email.message_from_bytes(response[1])
+            # decode email sender
+            From, encoding_1 = decode_header(msg.get("From"))[0]
+            sub, encoding_2 = decode_header(msg.get("Subject"))[0]
+            if isinstance(From, bytes):
+                From = From.decode(encoding_1)
+            if isinstance(sub, bytes):
+                sub = sub.decode(encoding_2)
+    sender(2, From)
+    sender(2, sub)
+    sender(2, s)
+
+
+def first_enter():
+    imap.select("INBOX")
+    result, data = imap.search(None, "ALL")
+    id_list = data[0].split()
+    latest_email_id = id_list[-1]
+    result, mes = imap.fetch(latest_email_id, "(RFC822)")
+    email_mes = email.message_from_bytes(mes[0][1])
+    email_mes.get
+    return email_mes["Message-Id"]
 
 
 def work():
-    z = 0
+    id_mes = first_enter()
+    print("start")
     while True:
-        time.sleep(5)
-        status, messages = imap.select("INBOX")
-        i = int(messages[0])
-        res, msg = imap.fetch(str(i), "(RFC822)")
-        for response in msg:
-            if isinstance(response, tuple):
-                # parse a bytes email into a message object
-                msg = email.message_from_bytes(response[1])
-                # decode email sender
-                From, encoding = decode_header(msg.get("From"))[0]
-                if isinstance(From, bytes):
-                    From = From.decode(encoding)
-        if z == 0:
-            z = 1
-            id = msg['Message-Id']
-            # print(1)
-        if (msg['Message-Id'] != id):
-            vk(From, msg)
-            id = msg['Message-Id']
-        imap.close()
-        
-def work2():
-    for event in longpoll.listen():
-        if event.type == VkBotEventType.MESSAGE_NEW:
-            if event.from_chat:
-                id = event.chat_id
-                print(id)
-                msg = event.object.message['text'].lower()
-                if msg == 'ping':
-                    sender(id, 'pong')
-                    
+        imap.select("INBOX")
+        result, data = imap.search(None, "ALL")
+        id_list = data[0].split()
+        latest_email_id = id_list[-1]
+
+        result, mes = imap.fetch(latest_email_id, "(RFC822)")
+        email_mes = email.message_from_bytes(mes[0][1])
+        email_mes.get
+
+        body = body_1(email_mes)
+
+        if email_mes["Message-Id"] != id_mes:
+            print(1)
+            vk(body, mes)
+            # attach(latest_email_id)
+            id_mes = email_mes['Message-Id']
+            imap.close()
+            time.sleep(5)
+
+
 try:
     work()
-except Exception or ConnectionError or ConnectionResetError or ConnectionAbortedError or RuntimeError or TimeoutError or BaseException as e:
+except Exception as e:
     print(e)
-    sender(1,e)
-# close the connection and logout
-#imap.logout()
+    sender(1, e)
