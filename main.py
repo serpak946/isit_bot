@@ -83,9 +83,9 @@ def vk(s, msg):
                 From = From.decode(encoding_1)
             if isinstance(sub, bytes):
                 sub = sub.decode(encoding_2)
-    sender(2, From)
-    sender(2, sub)
-    sender(2, s)
+    sender(1, From)
+    sender(1, sub)
+    sender(1, s)
 
 
 def first_enter():
@@ -100,7 +100,8 @@ def first_enter():
 
 
 def work():
-    id_mes = first_enter()
+    #id_mes = first_enter()
+    id_mes = "1"
     print("start")
     sender(1, "start")
     while True:
