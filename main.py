@@ -59,7 +59,7 @@ def body_1(email_mes):
     body = None
     bol = True
     for part in email_mes.walk():
-        print(part.get_payload)
+        # print(part.get_payload)
         if part.get_content_type() == "text/plain":
             body = part.get_payload(decode=True)
             body = body.decode('UTF-8')
