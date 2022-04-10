@@ -10,8 +10,8 @@ import requests
 from vk_api.bot_longpoll import VkBotLongPoll, VkBotEventType
 import os
 
-mail_name = os.environ.get("mail")
-password = os.environ.get("password")
+mail_name = os.environ.get("mail_test")
+password = os.environ.get("password_test")
 token = os.environ.get("Token")
 
 vk_session = vk_api.VkApi(token=token)
@@ -57,7 +57,7 @@ def body_1(email_mes):
     body = None
     bol = True
     for part in email_mes.walk():
-        # print(part.get_payload)
+        print(part.get_payload)
         if part.get_content_type() == "text/plain":
             body = part.get_payload(decode=True)
             body = body.decode('UTF-8')
@@ -78,7 +78,12 @@ def vk(s, msg):
             msg = email.message_from_bytes(response[1])
             # decode email sender
             From, encoding_1 = decode_header(msg.get("From"))[0]
-            sub, encoding_2 = decode_header(msg.get("Subject"))[0]
+            try:
+                sub, encoding_2 = decode_header(msg.get("Subject"))[0]
+            except Exception as e:
+                print(e)
+                #sender(1, e)
+                sub = "Без темы"
             if isinstance(From, bytes):
                 From = From.decode(encoding_1)
             if isinstance(sub, bytes):
@@ -103,7 +108,6 @@ def work():
     #id_mes = first_enter()
     id_mes = "1"
     print("start")
-    sender(1, "start")
     while True:
         imap.select("INBOX")
         result, data = imap.search(None, "ALL")
@@ -121,12 +125,14 @@ def work():
             vk(body, mes)
             # attach(latest_email_id)
             id_mes = email_mes['Message-Id']
+            print(id_mes)
             imap.close()
             time.sleep(5)
 
 
-try:
-    work()
-except Exception as e:
-    print(e)
-    sender(1, e)
+work()
+# try:
+#     work()
+# except Exception as e:
+#     print(e)
+#     sender(1, e)
