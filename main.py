@@ -10,8 +10,10 @@ import requests
 from vk_api.bot_longpoll import VkBotLongPoll, VkBotEventType
 import os
 
-mail_name = os.environ.get("mail_test")
-password = os.environ.get("password_test")
+# mail_name = os.environ.get("mail_test")
+# password = os.environ.get("password_test")
+mail_name = os.environ.get("mail")
+password = os.environ.get("password")
 token = os.environ.get("Token")
 
 vk_session = vk_api.VkApi(token=token)
@@ -88,9 +90,9 @@ def vk(s, msg):
                 From = From.decode(encoding_1)
             if isinstance(sub, bytes):
                 sub = sub.decode(encoding_2)
-    sender(1, From)
-    sender(1, sub)
-    sender(1, s)
+    sender(2, From)
+    sender(2, sub)
+    sender(2, s)
 
 
 def first_enter():
@@ -105,8 +107,8 @@ def first_enter():
 
 
 def work():
-    #id_mes = first_enter()
-    id_mes = "1"
+    id_mes = first_enter()
+    # id_mes = "1"
     print("start")
     while True:
         imap.select("INBOX")
@@ -125,7 +127,7 @@ def work():
             vk(body, mes)
             # attach(latest_email_id)
             id_mes = email_mes['Message-Id']
-            print(id_mes)
+            # print(id_mes)
             imap.close()
             time.sleep(5)
 
