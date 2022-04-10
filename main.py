@@ -130,9 +130,8 @@ def work():
             time.sleep(5)
 
 
-work()
-# try:
-#     work()
-# except Exception as e:
-#     print(e)
-#     sender(1, e)
+try:
+    work()
+except Exception as e:
+    print(e)
+    sender(1, e)
