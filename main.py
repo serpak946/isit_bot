@@ -23,6 +23,21 @@ imap = imaplib.IMAP4_SSL("imap.mail.ru")
 imap.login(mail_name, password)
 
 
+def clean(text):
+    while text.find("<div") != -1 or text.find("<a") != -1 or text.find("</a") != -1:
+        k1 = text.find('<')
+        k2 = text.find('>', k1)
+        temp_text = text[k1:k2+1]
+        text = text.replace(temp_text, "\n")
+
+    while text.find("\n\n") != -1:
+        text = text.replace("\n\n", "\n")
+
+    text = text.replace(text[text.find("&#"):text.find(";", text.find("&#"))+1], '')
+
+    return text
+
+
 def sender(id, text):
     if text == "" or text is None:
         pass
@@ -84,7 +99,6 @@ def vk(s, msg):
                 sub, encoding_2 = decode_header(msg.get("Subject"))[0]
             except Exception as e:
                 print(e)
-                #sender(1, e)
                 sub = "Без темы"
             if isinstance(From, bytes):
                 From = From.decode(encoding_1)
@@ -92,6 +106,7 @@ def vk(s, msg):
                 sub = sub.decode(encoding_2)
     sender(2, From)
     sender(2, sub)
+    s = clean(s)
     sender(2, s)
 
 
