@@ -1,8 +1,6 @@
 import imaplib
 import email
-import io
 import time
-import typing
 from email.header import decode_header
 from imap_tools import MailBox
 import vk_api
@@ -10,8 +8,6 @@ import requests
 from vk_api.bot_longpoll import VkBotLongPoll, VkBotEventType
 import os
 
-# mail_name = os.environ.get("mail_test")
-# password = os.environ.get("password_test")
 mail_name = os.environ.get("mail")
 password = os.environ.get("password")
 token = os.environ.get("Token")
@@ -24,24 +20,29 @@ imap.login(mail_name, password)
 
 
 def clean(text):
-    while text.find("<div") != -1 or text.find("<a") != -1 or text.find("</a") != -1:
-        k1 = text.find('<')
-        k2 = text.find('>', k1)
-        temp_text = text[k1:k2+1]
-        text = text.replace(temp_text, "\n")
+    try:
+        while text.find("<div") != -1 or text.find("<a") != -1 or text.find("</a") != -1:
+            k1 = text.find('<')
+            k2 = text.find('>', k1)
+            temp_text = text[k1:k2 + 1]
+            text = text.replace(temp_text, "\n")
 
-    while text.find("\n\n") != -1:
-        text = text.replace("\n\n", "\n")
+        while text.find("\n\n") != -1:
+            text = text.replace("\n\n", "\n")
 
-    text = text.replace(text[text.find("&#"):text.find(";", text.find("&#"))+1], '')
+        text = text.replace(text[text.find("&#"):text.find(";", text.find("&#")) + 1], '')
 
-    return text
+        return text
+
+    except:
+        return text
 
 
 def sender(id, text):
     if text == "" or text is None:
         pass
     else:
+        text = clean(text)
         vk_session.method('messages.send', {'chat_id': id, 'message': text, 'random_id': 0})
 
 
@@ -51,23 +52,16 @@ def attach(id):
             for att in msg.attachments:
                 with open(format(att.filename), 'wb') as f:
                     f.write(att.payload)
+                with open(format(att.filename), 'rb') as f:
+                    send_docs(f, att.filename)
 
 
-def send_docs(doc):
-    a = vk_session.method("docs.getMessagesUploadServer", {"type": "doc", "peer_id": 2000000001})
-    print(a)
+def send_docs(doc, name):
+    a = vk_session.method("docs.getMessagesUploadServer", {"type": "doc", "peer_id": 2000000002})
     b = requests.post(a["upload_url"], files={"file": doc}).json()
-    print(b)
-    c = vk_session.method("docs.save", {"file": b["file"], "title": "Document"})
-    print(c)
-
-    for q1 in c:
-        print(q1)
-    print()
-    print(c['doc']['owner_id'])
-    print(c['doc']['id'])
+    c = vk_session.method("docs.save", {"file": b["file"], "title": name})
     d = 'doc{}_{}'.format(c['doc']['owner_id'], c['doc']['id'])
-    vk_session.method('messages.send', {'chat_id': 1, 'attachment': d, 'random_id': 0})
+    vk_session.method('messages.send', {'chat_id': 2, 'attachment': d, 'random_id': 0})
 
 
 def body_1(email_mes):
@@ -97,7 +91,7 @@ def vk(s, msg):
             From, encoding_1 = decode_header(msg.get("From"))[0]
             try:
                 sub, encoding_2 = decode_header(msg.get("Subject"))[0]
-            except Exception as e:
+            except Exception:
                 print(e)
                 sub = "Без темы"
             if isinstance(From, bytes):
@@ -106,7 +100,6 @@ def vk(s, msg):
                 sub = sub.decode(encoding_2)
     sender(2, From)
     sender(2, sub)
-    s = clean(s)
     sender(2, s)
 
 
@@ -123,7 +116,6 @@ def first_enter():
 
 def work():
     id_mes = first_enter()
-    # id_mes = "1"
     print("start")
     while True:
         imap.select("INBOX")
@@ -138,9 +130,9 @@ def work():
         body = body_1(email_mes)
 
         if email_mes["Message-Id"] != id_mes:
-            print(1)
+            print("new message")
             vk(body, mes)
-            # attach(latest_email_id)
+            attach(latest_email_id)
             id_mes = email_mes['Message-Id']
             # print(id_mes)
             imap.close()
