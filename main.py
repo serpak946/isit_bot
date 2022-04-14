@@ -116,7 +116,7 @@ def first_enter():
 
 
 def work():
-    id_mes = first_enter()
+    # id_mes = first_enter()
     print("start")
     while True:
         imap.select("INBOX")
@@ -140,9 +140,12 @@ def work():
             time.sleep(6)
 
 
+id_mes = first_enter()
+
 while True:
     try:
         work()
     except Exception as e:
         print(e)
         sender(1, e)
+        time.sleep(6)
