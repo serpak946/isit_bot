@@ -34,7 +34,8 @@ def clean(text):
 
         return text
 
-    except:
+    except Exception:
+
         return text
 
 
@@ -42,7 +43,6 @@ def sender(id, text):
     if text == "" or text is None:
         pass
     else:
-        text = clean(text)
         vk_session.method('messages.send', {'chat_id': id, 'message': text, 'random_id': 0})
 
 
@@ -100,6 +100,7 @@ def vk(s, msg):
                 sub = sub.decode(encoding_2)
     sender(2, From)
     sender(2, sub)
+    s = clean(s)
     sender(2, s)
 
 
@@ -136,11 +137,12 @@ def work():
             id_mes = email_mes['Message-Id']
             # print(id_mes)
             imap.close()
-            time.sleep(5)
+            time.sleep(6)
 
 
-try:
-    work()
-except Exception as e:
-    print(e)
-    sender(1, e)
+while True:
+    try:
+        work()
+    except Exception as e:
+        print(e)
+        sender(1, e)
