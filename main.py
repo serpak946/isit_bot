@@ -115,6 +115,8 @@ def first_enter():
     return email_mes["Message-Id"]
 
 
+id_mes = first_enter()
+
 def work():
     # id_mes = first_enter()
     print("start")
@@ -139,8 +141,6 @@ def work():
             imap.close()
             time.sleep(6)
 
-
-id_mes = first_enter()
 
 while True:
     try:
