@@ -150,3 +150,8 @@ while True:
         print(e)
         sender(1, e)
         time.sleep(6)
+        vk_session = vk_api.VkApi(token=token)
+        longpoll = VkBotLongPoll(vk_session, 206937500)  # id группы
+        
+        imap = imaplib.IMAP4_SSL("imap.mail.ru")
+        imap.login(mail_name, password)
