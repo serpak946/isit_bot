@@ -118,6 +118,7 @@ def first_enter():
 id_mes = first_enter()
 
 def work():
+    global id_mes
     # id_mes = first_enter()
     print("start")
     while True:
