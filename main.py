@@ -91,7 +91,7 @@ def vk(s, msg):
             From, encoding_1 = decode_header(msg.get("From"))[0]
             try:
                 sub, encoding_2 = decode_header(msg.get("Subject"))[0]
-            except Exception:
+            except Exception as e:
                 print(e)
                 sub = "Без темы"
             if isinstance(From, bytes):
