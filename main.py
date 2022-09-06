@@ -18,6 +18,7 @@ longpoll = VkBotLongPoll(vk_session, 206937500)  # id группы
 imap = imaplib.IMAP4_SSL("imap.mail.ru")
 imap.login(mail_name, password)
 
+trying = 0
 
 def clean(text):
     try:
@@ -146,6 +147,7 @@ def work():
 while True:
     try:
         work()
+        trying = 0
     except Exception as e:
         print(e)
         sender(1, e)
@@ -155,3 +157,9 @@ while True:
         
         imap = imaplib.IMAP4_SSL("imap.mail.ru")
         imap.login(mail_name, password)
+        
+        if trying < 5:
+            trying += 1
+        else:
+            trying = 0
+            id_mes = first_enter()
